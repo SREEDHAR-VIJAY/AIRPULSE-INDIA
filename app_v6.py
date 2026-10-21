@@ -902,24 +902,34 @@ div[data-testid="stDataFrame"] {
 # HELPERS
 # ============================================================
 
+
 def locate_file(name):
     candidates = [
         DATA / name,
         RAW / name,
-        DATA / (name.replace(".csv", "")),
-        RAW / (name.replace(".csv", ""))
+        DATA / name.replace(".csv", ""),
+        RAW / name.replace(".csv", ""),
+        Path(r"D:\bda dataset\raw") / name,
     ]
 
     for p in candidates:
-        if p.exists():
+        if p.is_file():
             return p
 
-    matches = []
-    for folder in [DATA, RAW]:
-        if folder.exists():
-            matches.extend(folder.glob(name + "*"))
+    search_folders = [
+        DATA,
+        RAW,
+        Path(r"D:\bda dataset\raw"),
+    ]
 
-    return matches[0] if matches else None
+    for folder in search_folders:
+        if folder.is_dir():
+            matches = list(folder.glob(name + "*"))
+            if matches:
+                return matches[0]
+
+    return None
+
 
 
 @st.cache_data(show_spinner=False)
